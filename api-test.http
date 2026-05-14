@@ -1,0 +1,127 @@
+### 變數設定（登入後把 token 貼到這裡）
+@baseUrl = http://localhost:8080
+@token = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzc4Nzk3ODk2LCJleHAiOjE3Nzg4ODQyOTZ9.daeH2dy3zihhqahIVY-gHHS6lYp6YqNFMz0-Zh0LVpCMDuQ_0qV3YCoD9QvsOT_9
+
+### ==================== 認證 ====================
+
+### 註冊
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456"
+}
+
+### 登入
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456"
+}
+
+### ==================== 單字本 ====================
+
+### 取得所有單字本
+GET {{baseUrl}}/api/books
+Authorization: Bearer {{token}}
+
+### 新增單字本（日文）
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "JLPT N1 必考單字",
+  "language": "JAPANESE"
+}
+
+### 新增單字本（英文）
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "多益必考單字",
+  "language": "ENGLISH"
+}
+
+### 刪除單字本
+DELETE {{baseUrl}}/api/books/1
+Authorization: Bearer {{token}}
+
+### ==================== 單字 ====================
+
+### 取得單字本的所有單字
+GET {{baseUrl}}/api/books/1/words
+Authorization: Bearer {{token}}
+
+### 新增單字（日文）
+POST {{baseUrl}}/api/books/1/words
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "word": "勉強",
+  "reading": "べんきょう",
+  "translation": "學習、讀書",
+  "example": "毎日日本語を勉強しています。",
+  "level": "JLPT_N5",
+  "language": "JAPANESE"
+}
+
+### 新增單字（英文）
+POST {{baseUrl}}/api/books/2/words
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "word": "accomplish",
+  "reading": "",
+  "translation": "完成、達成",
+  "example": "She accomplished her goal.",
+  "level": "TOEIC_700_900",
+  "language": "ENGLISH"
+}
+
+### 修改單字
+PUT {{baseUrl}}/api/words/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "word": "勉強",
+  "reading": "べんきょう",
+  "translation": "學習、讀書（更新）",
+  "example": "毎日日本語を勉強しています。",
+  "level": "JLPT_N5",
+  "language": "JAPANESE"
+}
+
+### 刪除單字
+DELETE {{baseUrl}}/api/words/1
+Authorization: Bearer {{token}}
+
+### ==================== 測驗 ====================
+
+### 取得測驗單字（隨機 10 題）
+GET {{baseUrl}}/api/study/1
+Authorization: Bearer {{token}}
+
+### 送出答題結果
+POST {{baseUrl}}/api/study/result
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "wordId": 1,
+  "correct": true
+}
+
+### ==================== 統計 ====================
+
+### 取得學習統計
+GET {{baseUrl}}/api/stats
+Authorization: Bearer {{token}}
