@@ -31,6 +31,14 @@ public class WordBookController {
         return ResponseEntity.ok(wordBookService.createBook(userDetails.getUsername(), request));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<WordBookResponse> updateBook(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @Valid @RequestBody WordBookRequest request) {
+        return ResponseEntity.ok(wordBookService.updateBook(userDetails.getUsername(), id, request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(
             @AuthenticationPrincipal UserDetails userDetails,

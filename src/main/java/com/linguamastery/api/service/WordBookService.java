@@ -45,12 +45,27 @@ public class WordBookService {
     }
 
     @Transactional
+    public WordBookResponse updateBook(String email, Long bookId, WordBookRequest request) {
+        WordBook book = wordBookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("單字本不存在"));
+
+        if (!book.getUser().getEmail().equals(email)) {
+            throw new IllegalStateException("無權限操作此資源");
+        }
+
+        book.setName(request.getName());
+        book.setLanguage(request.getLanguage());
+
+        return toResponse(book, wordRepository.countByBookId(book.getId()));
+    }
+
+    @Transactional
     public void deleteBook(String email, Long bookId) {
         WordBook book = wordBookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("單字本不存在"));
 
-        if (!book.getUser().getId().equals(getUser(email).getId())) {
-            throw new SecurityException("無權限操作此資源");
+        if (!book.getUser().getEmail().equals(email)) {
+            throw new IllegalStateException("無權限操作此資源");
         }
 
         wordBookRepository.delete(book);
