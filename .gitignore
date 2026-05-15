@@ -17,6 +17,9 @@ out/
 # Local secrets (never commit)
 src/main/resources/application-local.yml
 
+# Local planning docs (never commit)
+ROADMAP.md
+
 # Logs
 *.log
 logs/
