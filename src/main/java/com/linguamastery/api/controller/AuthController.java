@@ -1,8 +1,6 @@
 package com.linguamastery.api.controller;
 
-import com.linguamastery.api.dto.AuthResponse;
-import com.linguamastery.api.dto.LoginRequest;
-import com.linguamastery.api.dto.RegisterRequest;
+import com.linguamastery.api.dto.*;
 import com.linguamastery.api.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +15,32 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
+        return ResponseEntity.ok(authService.verifyEmail(token));
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<MessageResponse> resendVerification(@Valid @RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.resendVerification(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.forgotPassword(request));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 }
