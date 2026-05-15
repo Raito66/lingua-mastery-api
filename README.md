@@ -25,9 +25,10 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 使用者註冊 / 登入（JWT 驗證）
 - Email 驗證（註冊後需驗證才能登入）
 - 忘記密碼 / 重設密碼
-- 單字書 CRUD
+- 單字書 CRUD（含重新命名與語言切換）
 - 單字 CRUD
-- 學習記錄與統計
+- 閃卡測驗與學習統計
+- 間隔重複複習系統（SRS / SM-2 演算法）
 
 ### 本地啟動
 
@@ -69,18 +70,28 @@ app:
 
 ### API 端點
 
-| 方法 | 路徑 | 說明 |
-|------|------|------|
-| POST | `/api/auth/register` | 註冊 |
-| POST | `/api/auth/login` | 登入 |
-| GET  | `/api/auth/verify` | Email 驗證 |
-| POST | `/api/auth/resend-verification` | 重寄驗證信 |
-| POST | `/api/auth/forgot-password` | 申請重設密碼 |
-| POST | `/api/auth/reset-password` | 重設密碼 |
-| GET  | `/api/books` | 取得單字書列表 |
-| POST | `/api/books` | 建立單字書 |
-| GET  | `/api/words/{bookId}` | 取得單字列表 |
-| POST | `/api/words/{bookId}` | 新增單字 |
+| 方法   | 路徑 | 說明 |
+|--------|------|------|
+| POST   | `/api/auth/register` | 註冊 |
+| POST   | `/api/auth/login` | 登入 |
+| GET    | `/api/auth/verify` | Email 驗證 |
+| POST   | `/api/auth/resend-verification` | 重寄驗證信 |
+| POST   | `/api/auth/forgot-password` | 申請重設密碼 |
+| POST   | `/api/auth/reset-password` | 重設密碼 |
+| GET    | `/api/books` | 取得單字書列表 |
+| POST   | `/api/books` | 建立單字書 |
+| PUT    | `/api/books/{id}` | 更新單字書名稱 / 語言 |
+| DELETE | `/api/books/{id}` | 刪除單字書 |
+| GET    | `/api/words/{bookId}` | 取得單字列表 |
+| POST   | `/api/words/{bookId}` | 新增單字 |
+| PUT    | `/api/words/{wordId}` | 更新單字 |
+| DELETE | `/api/words/{wordId}` | 刪除單字 |
+| GET    | `/api/study/{bookId}` | 取得本次閃卡題目 |
+| POST   | `/api/study/result` | 提交閃卡答題結果 |
+| GET    | `/api/stats` | 取得學習統計 |
+| GET    | `/api/review/stats` | 取得各書今日複習數量 |
+| GET    | `/api/review/{bookId}` | 取得本次 SRS 複習單字 |
+| POST   | `/api/review/result` | 提交 SRS 複習結果（更新排程） |
 
 ---
 
@@ -105,9 +116,10 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - User registration / login with JWT
 - Email verification (required before login)
 - Forgot password / password reset
-- Vocabulary book CRUD
+- Vocabulary book CRUD (rename & language switch)
 - Word CRUD
-- Learning records and statistics
+- Flashcard study and learning statistics
+- Spaced Repetition System (SRS / SM-2 algorithm)
 
 ### Getting Started
 
@@ -146,3 +158,29 @@ app:
 ```
 
 Server runs at `http://localhost:8080`
+
+---
+
+## 更新日誌 / Changelog
+
+### v0.3.0 (2026-05-15)
+- 新增 SRS 間隔重複複習系統（SM-2 演算法）
+- 新增單字書編輯功能（重新命名、切換語言）
+
+### v0.2.0
+- 新增 Email 驗證、忘記密碼、重設密碼功能
+
+### v0.1.0
+- 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
+
+---
+
+### v0.3.0 (2026-05-15)
+- Added SRS spaced repetition system (SM-2 algorithm)
+- Added vocabulary book edit (rename & language switch)
+
+### v0.2.0
+- Added email verification, forgot password, password reset
+
+### v0.1.0
+- Initial release: auth, vocabulary book CRUD, flashcard study, learning statistics
