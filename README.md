@@ -27,6 +27,8 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 忘記密碼 / 重設密碼
 - 單字書 CRUD（含重新命名與語言切換）
 - 單字 CRUD
+- CSV 批次匯入單字（含重複檢查、部分成功）
+- 單字批次刪除
 - 閃卡測驗與學習統計
 - 間隔重複複習系統（SRS / SM-2 演算法）
 
@@ -92,6 +94,8 @@ app:
 | GET    | `/api/review/stats` | 取得各書今日複習數量 |
 | GET    | `/api/review/{bookId}` | 取得本次 SRS 複習單字 |
 | POST   | `/api/review/result` | 提交 SRS 複習結果（更新排程） |
+| POST   | `/api/books/{bookId}/words/import` | CSV 批次匯入單字 |
+| DELETE | `/api/words/batch` | 批次刪除單字 |
 
 ---
 
@@ -118,6 +122,8 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - Forgot password / password reset
 - Vocabulary book CRUD (rename & language switch)
 - Word CRUD
+- CSV batch import (with duplicate check & partial success)
+- Batch word deletion
 - Flashcard study and learning statistics
 - Spaced Repetition System (SRS / SM-2 algorithm)
 
@@ -163,6 +169,11 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.4.0 (2026-05-16)
+- 新增 CSV 批次匯入單字（`POST /api/books/{bookId}/words/import`）
+- 新增單字批次刪除（`DELETE /api/words/batch`）
+- 新增重複單字檢查（單筆新增與 CSV 匯入皆適用）
+
 ### v0.3.0 (2026-05-15)
 - 新增 SRS 間隔重複複習系統（SM-2 演算法）
 - 新增單字書編輯功能（重新命名、切換語言）
@@ -174,6 +185,11 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.4.0 (2026-05-16)
+- Added CSV batch word import (`POST /api/books/{bookId}/words/import`)
+- Added batch word deletion (`DELETE /api/words/batch`)
+- Added duplicate word check (single add & CSV import)
 
 ### v0.3.0 (2026-05-15)
 - Added SRS spaced repetition system (SM-2 algorithm)
