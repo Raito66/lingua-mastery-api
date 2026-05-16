@@ -76,10 +76,18 @@ public class WordService {
                 .withSkipLines(1)   // 跳過表頭
                 .build()) {
 
-            String[] row;
             int lineNum = 1;
-            while ((row = reader.readNext()) != null) {
+            while (true) {
                 lineNum++;
+                String[] row;
+                try {
+                    row = reader.readNext();
+                    if (row == null) break;
+                } catch (Exception e) {
+                    failed++;
+                    errors.add("第 " + lineNum + " 行：CSV 格式錯誤");
+                    break;
+                }
                 try {
                     if (row.length < 3) {
                         throw new IllegalArgumentException("欄位不足（需要 word, reading, translation）");
