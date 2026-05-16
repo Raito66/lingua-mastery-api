@@ -3,6 +3,7 @@ package com.linguamastery.api.repository;
 import com.linguamastery.api.model.Word;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,4 +28,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     /** 批次統計多本書的新單字數量，避免 N×Query（回傳 [bookId, count] 陣列） */
     @Query("SELECT w.book.id, COUNT(w) FROM Word w WHERE w.book.id IN :bookIds AND w.id NOT IN (SELECT wr.word.id FROM WordReview wr WHERE wr.user.id = :userId) GROUP BY w.book.id")
     List<Object[]> countNewWordsByBookIdsForUser(@Param("bookIds") List<Long> bookIds, @Param("userId") Long userId);
+
+    @Modifying
+    @Query("DELETE FROM Word w WHERE w.book.id = :bookId")
+    void deleteByBookId(@Param("bookId") Long bookId);
 }

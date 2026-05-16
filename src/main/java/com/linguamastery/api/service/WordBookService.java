@@ -4,9 +4,11 @@ import com.linguamastery.api.dto.WordBookRequest;
 import com.linguamastery.api.dto.WordBookResponse;
 import com.linguamastery.api.model.User;
 import com.linguamastery.api.model.WordBook;
+import com.linguamastery.api.repository.StudyLogRepository;
 import com.linguamastery.api.repository.UserRepository;
 import com.linguamastery.api.repository.WordBookRepository;
 import com.linguamastery.api.repository.WordRepository;
+import com.linguamastery.api.repository.WordReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class WordBookService {
 
     private final WordBookRepository wordBookRepository;
     private final WordRepository wordRepository;
+    private final WordReviewRepository wordReviewRepository;
+    private final StudyLogRepository studyLogRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -68,6 +72,10 @@ public class WordBookService {
             throw new IllegalStateException("無權限操作此資源");
         }
 
+        // 依外鍵順序刪除：study_logs → word_reviews → words → word_books
+        studyLogRepository.deleteByBookId(bookId);
+        wordReviewRepository.deleteByBookId(bookId);
+        wordRepository.deleteByBookId(bookId);
         wordBookRepository.delete(book);
     }
 

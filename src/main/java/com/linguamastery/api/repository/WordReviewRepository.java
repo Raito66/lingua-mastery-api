@@ -3,6 +3,7 @@ package com.linguamastery.api.repository;
 import com.linguamastery.api.model.WordReview;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -25,4 +26,8 @@ public interface WordReviewRepository extends JpaRepository<WordReview, Long> {
     /** 統計每本單字書今日到期數，回傳 [bookId, count] 陣列 */
     @Query("SELECT wr.word.book.id, COUNT(wr) FROM WordReview wr WHERE wr.user.id = :userId AND wr.nextReviewAt <= :today GROUP BY wr.word.book.id")
     List<Object[]> countDueByBookForUser(@Param("userId") Long userId, @Param("today") LocalDate today);
+
+    @Modifying
+    @Query("DELETE FROM WordReview wr WHERE wr.word.book.id = :bookId")
+    void deleteByBookId(@Param("bookId") Long bookId);
 }
