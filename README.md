@@ -169,6 +169,9 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.4.1 (2026-05-16)
+- 修正刪除單字本時外鍵約束錯誤（cascade 依序刪除 study_logs → word_reviews → words）
+
 ### v0.4.0 (2026-05-16)
 - 新增 CSV 批次匯入單字（`POST /api/books/{bookId}/words/import`）
 - 新增單字批次刪除（`DELETE /api/words/batch`）
@@ -185,6 +188,9 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.4.1 (2026-05-16)
+- Fixed foreign key constraint error when deleting vocabulary books (cascade: study_logs → word_reviews → words)
 
 ### v0.4.0 (2026-05-16)
 - Added CSV batch word import (`POST /api/books/{bookId}/words/import`)
