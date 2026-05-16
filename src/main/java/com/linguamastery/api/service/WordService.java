@@ -44,6 +44,10 @@ public class WordService {
     public WordResponse addWord(String email, Long bookId, WordRequest request) {
         WordBook book = getBookForUser(email, bookId);
 
+        if (wordRepository.existsByBookIdAndWord(bookId, request.getWord().trim())) {
+            throw new IllegalArgumentException("「" + request.getWord().trim() + "」已存在於此單字本");
+        }
+
         Word word = new Word();
         word.setBook(book);
         applyRequest(word, request);
@@ -100,6 +104,9 @@ public class WordService {
 
                     if (wordStr.isEmpty())    throw new IllegalArgumentException("word 不能為空");
                     if (translation.isEmpty()) throw new IllegalArgumentException("translation 不能為空");
+                    if (wordRepository.existsByBookIdAndWord(book.getId(), wordStr)) {
+                        throw new IllegalArgumentException("單字已存在：" + wordStr);
+                    }
 
                     WordLevel level = null;
                     if (!levelStr.isEmpty()) {

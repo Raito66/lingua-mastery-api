@@ -11,6 +11,7 @@ import java.util.List;
 public interface WordRepository extends JpaRepository<Word, Long> {
     List<Word> findByBookIdOrderByCreatedAtDesc(Long bookId);
     long countByBookId(Long bookId);
+    boolean existsByBookIdAndWord(Long bookId, String word);
 
     @Query(value = "SELECT * FROM words WHERE book_id = :bookId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Word> findRandomWordsByBookId(@Param("bookId") Long bookId, @Param("limit") int limit);
