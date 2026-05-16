@@ -147,6 +147,16 @@ public class WordService {
         wordRepository.delete(word);
     }
 
+    @Transactional
+    public void deleteWords(String email, List<Long> wordIds) {
+        if (wordIds == null || wordIds.isEmpty()) {
+            throw new IllegalArgumentException("請至少選擇一個單字");
+        }
+        List<Word> words = wordRepository.findAllById(wordIds);
+        words.forEach(word -> validateOwnership(email, word));
+        wordRepository.deleteAll(words);
+    }
+
     private void applyRequest(Word word, WordRequest request) {
         word.setWord(request.getWord());
         word.setReading(request.getReading());

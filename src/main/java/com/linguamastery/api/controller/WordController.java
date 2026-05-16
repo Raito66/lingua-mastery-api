@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 import java.util.List;
 
@@ -68,6 +69,14 @@ public class WordController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id) {
         wordService.deleteWord(userDetails.getUsername(), id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/api/words/batch")
+    public ResponseEntity<Void> deleteWords(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody List<Long> ids) {
+        wordService.deleteWords(userDetails.getUsername(), ids);
         return ResponseEntity.noContent().build();
     }
 }
