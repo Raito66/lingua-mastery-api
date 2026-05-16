@@ -1,18 +1,26 @@
 package com.linguamastery.api.service;
 
+import com.linguamastery.api.dto.ImportResultResponse;
 import com.linguamastery.api.dto.WordRequest;
 import com.linguamastery.api.dto.WordResponse;
 import com.linguamastery.api.model.User;
 import com.linguamastery.api.model.Word;
 import com.linguamastery.api.model.WordBook;
+import com.linguamastery.api.model.WordLevel;
 import com.linguamastery.api.repository.UserRepository;
 import com.linguamastery.api.repository.WordBookRepository;
 import com.linguamastery.api.repository.WordRepository;
+import com.opencsv.CSVReaderBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,6 +60,67 @@ public class WordService {
         applyRequest(word, request);
 
         return toResponse(wordRepository.save(word));
+    }
+
+    // 不標 @Transactional：每行呼叫 wordRepository.save() 各自帶獨立 transaction，
+    // 確保部分失敗不會 rollback 已成功的行。
+    public ImportResultResponse importWords(String email, Long bookId, MultipartFile file) throws IOException {
+        WordBook book = getBookForUser(email, bookId);
+
+        int success = 0;
+        int failed = 0;
+        List<String> errors = new ArrayList<>();
+
+        try (var reader = new CSVReaderBuilder(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
+                .withSkipLines(1)   // 跳過表頭
+                .build()) {
+
+            String[] row;
+            int lineNum = 1;
+            while ((row = reader.readNext()) != null) {
+                lineNum++;
+                try {
+                    if (row.length < 3) {
+                        throw new IllegalArgumentException("欄位不足（需要 word, reading, translation）");
+                    }
+                    String wordStr    = row[0].trim();
+                    String reading    = row[1].trim();
+                    String translation = row[2].trim();
+                    String example    = row.length > 3 ? row[3].trim() : "";
+                    String levelStr   = row.length > 4 ? row[4].trim() : "";
+
+                    if (wordStr.isEmpty())    throw new IllegalArgumentException("word 不能為空");
+                    if (translation.isEmpty()) throw new IllegalArgumentException("translation 不能為空");
+
+                    WordLevel level = null;
+                    if (!levelStr.isEmpty()) {
+                        try {
+                            level = WordLevel.valueOf(levelStr.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            throw new IllegalArgumentException("不合法的 level 值：" + levelStr);
+                        }
+                    }
+
+                    Word word = new Word();
+                    word.setBook(book);
+                    word.setWord(wordStr);
+                    word.setReading(reading.isEmpty() ? null : reading);
+                    word.setTranslation(translation);
+                    word.setExample(example.isEmpty() ? null : example);
+                    word.setLevel(level);
+                    word.setLanguage(book.getLanguage());
+                    wordRepository.save(word);
+                    success++;
+
+                } catch (Exception e) {
+                    failed++;
+                    errors.add("第 " + lineNum + " 行：" + e.getMessage());
+                }
+            }
+        }
+
+        return new ImportResultResponse(success + failed, success, failed, errors);
     }
 
     @Transactional
