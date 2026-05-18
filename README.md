@@ -31,6 +31,7 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 單字批次刪除
 - 閃卡測驗與學習統計
 - 間隔重複複習系統（SRS / SM-2 演算法）
+- 每日學習 Streak（連續天數 + 今日練習數）
 
 ### 本地啟動
 
@@ -91,6 +92,7 @@ app:
 | GET    | `/api/study/{bookId}` | 取得本次閃卡題目 |
 | POST   | `/api/study/result` | 提交閃卡答題結果 |
 | GET    | `/api/stats` | 取得學習統計 |
+| GET    | `/api/stats/streak` | 取得連續天數與今日練習數 |
 | GET    | `/api/review/stats` | 取得各書今日複習數量 |
 | GET    | `/api/review/{bookId}` | 取得本次 SRS 複習單字 |
 | POST   | `/api/review/result` | 提交 SRS 複習結果（更新排程） |
@@ -126,6 +128,7 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - Batch word deletion
 - Flashcard study and learning statistics
 - Spaced Repetition System (SRS / SM-2 algorithm)
+- Daily learning streak (consecutive days + today's count)
 
 ### Getting Started
 
@@ -169,6 +172,11 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.5.0 (2026-05-19)
+- 新增每日學習 Streak 功能（`GET /api/stats/streak`）
+- 新增 `daily_records` 資料表，記錄每日學習數量
+- StudyService / ReviewService 提交結果後自動記錄當日活動
+
 ### v0.4.1 (2026-05-16)
 - 修正刪除單字本時外鍵約束錯誤（cascade 依序刪除 study_logs → word_reviews → words）
 
@@ -188,6 +196,11 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.5.0 (2026-05-19)
+- Added daily learning streak (`GET /api/stats/streak`)
+- Added `daily_records` table to track daily study counts
+- StudyService / ReviewService now record daily activity after each submission
 
 ### v0.4.1 (2026-05-16)
 - Fixed foreign key constraint error when deleting vocabulary books (cascade: study_logs → word_reviews → words)
