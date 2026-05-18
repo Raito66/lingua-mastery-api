@@ -27,6 +27,7 @@ public class StudyService {
     private final WordBookRepository wordBookRepository;
     private final UserRepository userRepository;
     private final StudyLogRepository studyLogRepository;
+    private final StatsService statsService;
 
     @Transactional(readOnly = true)
     public List<WordResponse> getStudyWords(String email, Long bookId) {
@@ -59,6 +60,8 @@ public class StudyService {
         log.setWord(word);
         log.setCorrect(request.getCorrect());
         studyLogRepository.save(log);
+
+        statsService.recordDailyActivity(user);
     }
 
     private User getUser(String email) {

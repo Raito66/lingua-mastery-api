@@ -1,13 +1,20 @@
 package com.linguamastery.api.service;
 
 import com.linguamastery.api.dto.StatsResponse;
+import com.linguamastery.api.dto.StreakResponse;
+import com.linguamastery.api.model.DailyRecord;
 import com.linguamastery.api.model.User;
+import com.linguamastery.api.repository.DailyRecordRepository;
 import com.linguamastery.api.repository.StudyLogRepository;
 import com.linguamastery.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +22,7 @@ public class StatsService {
 
     private final StudyLogRepository studyLogRepository;
     private final UserRepository userRepository;
+    private final DailyRecordRepository dailyRecordRepository;
 
     @Transactional(readOnly = true)
     public StatsResponse getStats(String email) {
@@ -30,5 +38,56 @@ public class StatsService {
         stats.setTotalCorrect(correct);
         stats.setAccuracy(accuracy);
         return stats;
+    }
+
+    @Transactional(readOnly = true)
+    public StreakResponse getStreak(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("使用者不存在"));
+
+        int todayCount = dailyRecordRepository
+                .findByUserIdAndDate(user.getId(), LocalDate.now())
+                .map(DailyRecord::getWordsStudied)
+                .orElse(0);
+
+        List<DailyRecord> records = dailyRecordRepository.findByUserIdOrderByDateDesc(user.getId());
+
+        int streak = 0;
+        // 今天還沒練習時，從昨天開始算連續天數，避免昨天以前的紀錄被清零
+        LocalDate expected = todayCount > 0 ? LocalDate.now() : LocalDate.now().minusDays(1);
+        for (DailyRecord record : records) {
+            if (record.getDate().equals(expected)) {
+                streak++;
+                expected = expected.minusDays(1);
+            } else if (record.getDate().isBefore(expected)) {
+                break;
+            }
+        }
+
+        return new StreakResponse(streak, todayCount);
+    }
+
+    /** StudyService / ReviewService 呼叫，記錄今日學習 */
+    @Transactional
+    public void recordDailyActivity(User user) {
+        try {
+            DailyRecord record = dailyRecordRepository
+                    .findByUserIdAndDate(user.getId(), LocalDate.now())
+                    .orElseGet(() -> {
+                        DailyRecord r = new DailyRecord();
+                        r.setUser(user);
+                        r.setDate(LocalDate.now());
+                        return r;
+                    });
+            record.setWordsStudied(record.getWordsStudied() + 1);
+            dailyRecordRepository.save(record);
+        } catch (DataIntegrityViolationException e) {
+            // 並發情況下兩個請求同時新增同一天的紀錄，重新查詢並遞增
+            dailyRecordRepository.findByUserIdAndDate(user.getId(), LocalDate.now())
+                    .ifPresent(record -> {
+                        record.setWordsStudied(record.getWordsStudied() + 1);
+                        dailyRecordRepository.save(record);
+                    });
+        }
     }
 }
