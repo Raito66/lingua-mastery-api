@@ -72,7 +72,7 @@ public class QuizService {
         // 不足 3 個時從其他書補
         if (wrongOptions.size() < 3) {
             int needed = 3 - wrongOptions.size();
-            wordRepository.findRandomWordsFromOtherBooks(userId, bookId, (long) needed)
+            wordRepository.findRandomWordsFromOtherBooks(userId, bookId, needed)
                     .stream().map(Word::getTranslation).forEach(wrongOptions::add);
         }
 
