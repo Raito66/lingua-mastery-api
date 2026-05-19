@@ -16,4 +16,5 @@ public class WordResponse {
     private WordLevel level;
     private Language language;
     private LocalDateTime createdAt;
+    private int proficiencyLevel; // 0=未學習 1=學習中 2=已熟悉 3=已精通
 }

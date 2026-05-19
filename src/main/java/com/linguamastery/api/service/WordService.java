@@ -7,7 +7,9 @@ import com.linguamastery.api.model.User;
 import com.linguamastery.api.model.Word;
 import com.linguamastery.api.model.WordBook;
 import com.linguamastery.api.model.WordLevel;
+import com.linguamastery.api.model.UserWordStatus;
 import com.linguamastery.api.repository.UserRepository;
+import com.linguamastery.api.repository.UserWordStatusRepository;
 import com.linguamastery.api.repository.WordBookRepository;
 import com.linguamastery.api.repository.WordRepository;
 import com.opencsv.CSVReaderBuilder;
@@ -22,6 +24,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +34,26 @@ public class WordService {
     private final WordRepository wordRepository;
     private final WordBookRepository wordBookRepository;
     private final UserRepository userRepository;
+    private final UserWordStatusRepository statusRepository;
 
     @Transactional(readOnly = true)
     public List<WordResponse> getWords(String email, Long bookId) {
-        WordBook book = getBookForUser(email, bookId);
-        return wordRepository.findByBookIdOrderByCreatedAtDesc(book.getId())
+        User user = getUser(email);
+        WordBook book = wordBookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("單字本不存在"));
+        if (!book.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("無權限操作此資源");
+        }
+
+        // 批次取得熟練度，避免 N+1
+        Map<Long, Integer> levelMap = statusRepository
+                .findByUserIdAndBookId(user.getId(), bookId)
                 .stream()
-                .map(this::toResponse)
+                .collect(Collectors.toMap(s -> s.getWord().getId(), UserWordStatus::getLevel));
+
+        return wordRepository.findByBookIdOrderByCreatedAtDesc(bookId)
+                .stream()
+                .map(word -> toResponse(word, levelMap.getOrDefault(word.getId(), 0)))
                 .toList();
     }
 
@@ -52,7 +69,7 @@ public class WordService {
         word.setBook(book);
         applyRequest(word, request);
 
-        return toResponse(wordRepository.save(word));
+        return toResponse(wordRepository.save(word), 0);
     }
 
     @Transactional
@@ -63,7 +80,10 @@ public class WordService {
         validateOwnership(email, word);
         applyRequest(word, request);
 
-        return toResponse(wordRepository.save(word));
+        User user = getUser(email);
+        int level = statusRepository.findByUserIdAndWordId(user.getId(), wordId)
+                .map(UserWordStatus::getLevel).orElse(0);
+        return toResponse(wordRepository.save(word), level);
     }
 
     // 不標 @Transactional：每行呼叫 wordRepository.save() 各自帶獨立 transaction，
@@ -189,7 +209,7 @@ public class WordService {
                 .orElseThrow(() -> new UsernameNotFoundException("使用者不存在"));
     }
 
-    private WordResponse toResponse(Word word) {
+    private WordResponse toResponse(Word word, int proficiencyLevel) {
         WordResponse response = new WordResponse();
         response.setId(word.getId());
         response.setWord(word.getWord());
@@ -199,6 +219,7 @@ public class WordService {
         response.setLevel(word.getLevel());
         response.setLanguage(word.getLanguage());
         response.setCreatedAt(word.getCreatedAt());
+        response.setProficiencyLevel(proficiencyLevel);
         return response;
     }
 }

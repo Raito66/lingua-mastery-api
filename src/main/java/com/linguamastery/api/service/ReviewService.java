@@ -36,6 +36,7 @@ public class ReviewService {
     private final WordBookRepository wordBookRepository;
     private final UserRepository userRepository;
     private final StatsService statsService;
+    private final ProficiencyService proficiencyService;
 
     /** 取得本次複習單字（到期複習 + 新單字） */
     @Transactional(readOnly = true)
@@ -90,6 +91,7 @@ public class ReviewService {
         reviewRepository.save(review);
 
         statsService.recordDailyActivity(user);
+        proficiencyService.updateStatus(user, word, correct);
     }
 
     /** 取得所有單字本的今日複習統計 */
