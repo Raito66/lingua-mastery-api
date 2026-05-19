@@ -29,6 +29,10 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     @Query("SELECT w.book.id, COUNT(w) FROM Word w WHERE w.book.id IN :bookIds AND w.id NOT IN (SELECT wr.word.id FROM WordReview wr WHERE wr.user.id = :userId) GROUP BY w.book.id")
     List<Object[]> countNewWordsByBookIdsForUser(@Param("bookIds") List<Long> bookIds, @Param("userId") Long userId);
 
+    /** 從使用者的其他書隨機取單字，用於選擇題補足錯誤選項 */
+    @Query(value = "SELECT * FROM words w JOIN word_books wb ON w.book_id = wb.id WHERE wb.user_id = :userId AND w.book_id != :bookId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
+    List<Word> findRandomWordsFromOtherBooks(@Param("userId") Long userId, @Param("bookId") Long bookId, @Param("limit") int limit);
+
     @Modifying
     @Query("DELETE FROM Word w WHERE w.book.id = :bookId")
     void deleteByBookId(@Param("bookId") Long bookId);
