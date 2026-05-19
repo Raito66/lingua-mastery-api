@@ -7,15 +7,22 @@ databases:
 services:
   - type: web
     name: lingua-mastery-api
-    runtime: java
+    env: docker
+    dockerfilePath: ./Dockerfile
     plan: free
-    buildCommand: "./gradlew bootJar -x test"
-    startCommand: "java -jar build/libs/lingua-mastery-api-0.0.1-SNAPSHOT.jar"
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_HOST
         fromDatabase:
           name: lingua-mastery-db
-          property: jdbcInternalConnectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: lingua-mastery-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: lingua-mastery-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: lingua-mastery-db
