@@ -13,12 +13,13 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 ### 技術棧
 
 - **框架**：Spring Boot 3.3.5
-- **語言**：Java 17
+- **語言**：Java 21
 - **資料庫**：PostgreSQL
 - **ORM**：Spring Data JPA / Hibernate
 - **驗證**：JWT（JSON Web Token）
-- **Email**：Spring Mail + Gmail SMTP
+- **Email**：Resend HTTP API
 - **建置工具**：Gradle
+- **部署**：Render（後端）、Vercel（前端）
 
 ### 主要功能
 
@@ -38,28 +39,28 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 
 #### 前置條件
 
-- Java 17+
+- Java 21+
 - PostgreSQL（建立資料庫 `lingua_mastery`）
 - IntelliJ IDEA（建議）
 
 #### 設定環境
 
-1. 複製 `application-local.yml.example` 並命名為 `application-local.yml`：
+1. 在 `src/main/resources/` 建立 `application-local.yml`（此檔案已在 `.gitignore`，不會被提交）：
 
 ```yaml
 spring:
   datasource:
     password: 你的資料庫密碼
-  mail:
-    username: 你的Gmail帳號
-    password: 你的Gmail應用程式密碼
+
+resend:
+  api-key: 你的_Resend_API_Key  # 從 resend.com 取得
 
 jwt:
   secret: 你的JWT密鑰（至少32字元）
 
 app:
   mail:
-    from: "LinguaMastery <你的Gmail帳號>"
+    from: "LinguaMastery <onboarding@resend.dev>"
 ```
 
 2. IntelliJ Run Configuration → **Active profiles** 填入 `local`
@@ -112,12 +113,13 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 ### Tech Stack
 
 - **Framework**: Spring Boot 3.3.5
-- **Language**: Java 17
+- **Language**: Java 21
 - **Database**: PostgreSQL
 - **ORM**: Spring Data JPA / Hibernate
 - **Auth**: JWT (JSON Web Token)
-- **Email**: Spring Mail + Gmail SMTP
+- **Email**: Resend HTTP API
 - **Build**: Gradle
+- **Deploy**: Render (backend), Vercel (frontend)
 
 ### Features
 
@@ -137,28 +139,28 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 
 #### Prerequisites
 
-- Java 17+
+- Java 21+
 - PostgreSQL (create database `lingua_mastery`)
 - IntelliJ IDEA (recommended)
 
 #### Configuration
 
-1. Create `application-local.yml` under `src/main/resources/`:
+1. Create `application-local.yml` under `src/main/resources/` (already in `.gitignore`, never committed):
 
 ```yaml
 spring:
   datasource:
     password: your_db_password
-  mail:
-    username: your_gmail@gmail.com
-    password: your_gmail_app_password
+
+resend:
+  api-key: your_resend_api_key  # Get it from resend.com
 
 jwt:
   secret: your-jwt-secret-at-least-32-characters
 
 app:
   mail:
-    from: "LinguaMastery <your_gmail@gmail.com>"
+    from: "LinguaMastery <onboarding@resend.dev>"
 ```
 
 2. In IntelliJ Run Configuration, set **Active profiles** to `local`
@@ -174,6 +176,12 @@ Server runs at `http://localhost:8080`
 ---
 
 ## 更新日誌 / Changelog
+
+### v0.8.0 (2026-05-19)
+- 後端部署至 Render（https://lingua-mastery-api.onrender.com）
+- 前端部署至 Vercel（https://lingua-mastery-web.vercel.app）
+- 改用 Resend HTTP API 寄信，取代 Gmail SMTP（解決雲端平台封鎖 SMTP 問題）
+- Android APK 發布至 GitHub Releases，可直接下載安裝
 
 ### v0.7.0 (2026-05-19)
 - 新增單字熟練度分級（0 未學習 → 1 學習中 → 2 已熟悉 → 3 已精通）
@@ -212,6 +220,12 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.8.0 (2026-05-19)
+- Deployed backend to Render (https://lingua-mastery-api.onrender.com)
+- Deployed frontend to Vercel (https://lingua-mastery-web.vercel.app)
+- Replaced Gmail SMTP with Resend HTTP API (resolves cloud platform SMTP blocking)
+- Published Android APK to GitHub Releases for direct download
 
 ### v0.7.0 (2026-05-19)
 - Added word proficiency levels (0 not learned → 1 learning → 2 familiar → 3 mastered)
