@@ -1,0 +1,36 @@
+databases:
+  - name: lingua-mastery-db
+    databaseName: lingua_mastery
+    user: lingua_mastery_user
+    plan: free
+
+services:
+  - type: web
+    name: lingua-mastery-api
+    runtime: java
+    plan: free
+    buildCommand: "./gradlew bootJar -x test"
+    startCommand: "java -jar build/libs/lingua-mastery-api-0.0.1-SNAPSHOT.jar"
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: lingua-mastery-db
+          property: jdbcInternalConnectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: lingua-mastery-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: lingua-mastery-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_URL
+        value: https://lingua-mastery-api.onrender.com
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
