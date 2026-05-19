@@ -34,7 +34,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: APP_URL
-        value: https://lingua-mastery-api.onrender.com
+        value: https://lingua-mastery-web.vercel.app
       - key: RESEND_API_KEY
         sync: false  # Resend API Key，從 resend.com 取得
       - key: MAIL_APP_FROM
