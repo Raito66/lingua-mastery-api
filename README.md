@@ -175,6 +175,14 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.7.0 (2026-05-19)
+- 新增單字熟練度分級（0 未學習 → 1 學習中 → 2 已熟悉 → 3 已精通）
+- 新增 `user_word_status` 資料表，記錄每位使用者對每個單字的熟練度與連續答對次數
+- WordResponse 新增 `proficiencyLevel` 欄位
+- StudyService / ReviewService 答題後自動更新熟練度
+- 修正熟練度升級 bug：避免同一次答題從 level 1 跳到 level 3
+- 修正並發 INSERT 衝突：REQUIRES_NEW 確保 retry 在新 transaction 執行
+
 ### v0.6.0 (2026-05-19)
 - 新增選擇題測驗（`GET /api/quiz/{bookId}`）
 - Fisher-Yates 隨機錯誤選項，不足時從其他書補足
@@ -204,6 +212,14 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.7.0 (2026-05-19)
+- Added word proficiency levels (0 not learned → 1 learning → 2 familiar → 3 mastered)
+- Added `user_word_status` table to track per-user proficiency and correct answer streaks
+- Added `proficiencyLevel` field to WordResponse
+- StudyService / ReviewService now update proficiency after each answer
+- Fixed proficiency level-skip bug (prevented level 1 → level 3 in a single answer)
+- Fixed concurrent INSERT race condition using REQUIRES_NEW transaction on retry
 
 ### v0.6.0 (2026-05-19)
 - Added multiple choice quiz (`GET /api/quiz/{bookId}`)
