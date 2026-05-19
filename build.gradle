@@ -36,8 +36,8 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Mail
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // Resend（HTTP API 寄信，取代 SMTP）
+    implementation 'com.resend:resend-java:3.1.0'
 
     // CSV 解析
     implementation 'com.opencsv:opencsv:5.9'

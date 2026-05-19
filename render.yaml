@@ -35,9 +35,7 @@ services:
         generateValue: true
       - key: APP_URL
         value: https://lingua-mastery-api.onrender.com
-      - key: MAIL_APP_USERNAME
-        sync: false  # 寄信用的 Gmail 帳號，例如 your@gmail.com
-      - key: MAIL_APP_PASSWORD
-        sync: false  # Gmail 應用程式密碼（App Password），非 Gmail 登入密碼
+      - key: RESEND_API_KEY
+        sync: false  # Resend API Key，從 resend.com 取得
       - key: MAIL_APP_FROM
-        sync: false  # 信件顯示的寄件者，例如 LinguaMastery <your@gmail.com>
+        sync: false  # 信件顯示的寄件者，需使用 Resend 已驗證的網域，例如 LinguaMastery <noreply@yourdomain.com>
