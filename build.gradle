@@ -39,6 +39,9 @@ dependencies {
     // Resend（HTTP API 寄信，取代 SMTP）
     implementation 'com.resend:resend-java:3.1.0'
 
+    // Rate limiting
+    implementation 'com.bucket4j:bucket4j-core:8.10.1'
+
     // CSV 解析
     implementation 'com.opencsv:opencsv:5.9'
 
