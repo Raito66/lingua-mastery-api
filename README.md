@@ -30,7 +30,7 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 密碼強度驗證（至少 8 碼，須含英文字母與數字）
 - 單字書 CRUD（含重新命名與語言切換）
 - 單字 CRUD
-- CSV 批次匯入單字（含重複檢查、部分成功）
+- CSV 批次匯入單字（含重複檢查、部分成功、UTF-8 / Shift-JIS 編碼自動偵測、500 筆上限）
 - 單字批次刪除
 - 閃卡測驗與學習統計
 - 間隔重複複習系統（SRS / SM-2 演算法）
@@ -132,7 +132,7 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - Password strength validation (min 8 chars, letters + numbers required)
 - Vocabulary book CRUD (rename & language switch)
 - Word CRUD
-- CSV batch import (with duplicate check & partial success)
+- CSV batch import (duplicate check, partial success, UTF-8 / Shift-JIS auto-detection, 500 row limit)
 - Batch word deletion
 - Flashcard study and learning statistics
 - Spaced Repetition System (SRS / SM-2 algorithm)
@@ -181,6 +181,16 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.9.6 (2026-05-21)
+- CSV 匯入新增編碼自動偵測（UTF-8 BOM / Shift-JIS，解決日文 Windows Excel 亂碼問題）
+- CSV 匯入新增最大 500 筆上限，超出時回報提示並略過剩餘資料
+- CSV 匯入超過 5MB 時回傳友善錯誤訊息（HTTP 413）
+- 新增日文 / 英文範例 CSV 靜態下載（`/sample-words-japanese.csv`、`/sample-words-english.csv`）
+
+### v0.9.5 (2026-05-21)
+- 新增登入 / 註冊 Rate Limiting（登入 5 次/分鐘、註冊 3 次/10 分鐘，依 IP）
+- 新增後端密碼強度驗證（至少 8 碼，須含英文字母與數字）
+
 ### v0.8.0 (2026-05-19)
 - 後端部署至 Render（https://lingua-mastery-api.onrender.com）
 - 前端部署至 Vercel（https://lingua-mastery-web.vercel.app）
@@ -224,6 +234,16 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.9.6 (2026-05-21)
+- CSV import: auto charset detection (UTF-8 BOM / Shift-JIS, fixes Japanese Windows Excel encoding)
+- CSV import: 500 row limit with graceful truncation message
+- CSV import: 5MB file size limit with HTTP 413 error response
+- Added sample CSV static files (`/sample-words-japanese.csv`, `/sample-words-english.csv`)
+
+### v0.9.5 (2026-05-21)
+- Added rate limiting (login: 5/min, register: 3/10min per IP)
+- Added backend password strength validation (min 8 chars, letters + numbers)
 
 ### v0.8.0 (2026-05-19)
 - Deployed backend to Render (https://lingua-mastery-api.onrender.com)
