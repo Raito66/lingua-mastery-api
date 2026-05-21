@@ -19,8 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +91,30 @@ public class WordService {
         return toResponse(wordRepository.save(word), level);
     }
 
+    private static final int MAX_IMPORT_ROWS = 500;
+
+    /**
+     * 偵測 CSV 編碼並計算 BOM offset，回傳 [charset, bomByteCount]。
+     * 優先檢查 UTF-8 BOM（EF BB BF），再嘗試嚴格 UTF-8 解碼，失敗則 fallback 至 Windows-31J（Shift-JIS）。
+     */
+    private static Object[] detectCharsetAndBom(byte[] bytes) {
+        if (bytes.length >= 3
+                && bytes[0] == (byte) 0xEF
+                && bytes[1] == (byte) 0xBB
+                && bytes[2] == (byte) 0xBF) {
+            return new Object[]{ StandardCharsets.UTF_8, 3 };
+        }
+        try {
+            CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+            decoder.decode(ByteBuffer.wrap(bytes));
+            return new Object[]{ StandardCharsets.UTF_8, 0 };
+        } catch (Exception e) {
+            return new Object[]{ Charset.forName("Windows-31J"), 0 }; // Shift-JIS（日文 Windows Excel 預設）
+        }
+    }
+
     // 不標 @Transactional：每行呼叫 wordRepository.save() 各自帶獨立 transaction，
     // 確保部分失敗不會 rollback 已成功的行。
     public ImportResultResponse importWords(String email, Long bookId, MultipartFile file) throws IOException {
@@ -95,12 +124,19 @@ public class WordService {
         int failed = 0;
         List<String> errors = new ArrayList<>();
 
+        byte[] bytes = file.getBytes();
+        Object[] charsetAndBom = detectCharsetAndBom(bytes);
+        Charset charset = (Charset) charsetAndBom[0];
+        int offset = (int) charsetAndBom[1];
+
         try (var reader = new CSVReaderBuilder(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
+                new InputStreamReader(
+                        new ByteArrayInputStream(bytes, offset, bytes.length - offset), charset))
                 .withSkipLines(1)   // 跳過表頭
                 .build()) {
 
-            int lineNum = 1;
+            int lineNum = 1;       // 第 1 行為表頭（已跳過），從第 2 行開始計
+            int rowsRead = 0;
             while (true) {
                 lineNum++;
                 String[] row;
@@ -110,6 +146,11 @@ public class WordService {
                 } catch (Exception e) {
                     failed++;
                     errors.add("第 " + lineNum + " 行：CSV 格式錯誤");
+                    break;
+                }
+                rowsRead++;
+                if (rowsRead > MAX_IMPORT_ROWS) {
+                    errors.add("已達最大匯入上限（" + MAX_IMPORT_ROWS + " 筆），後續資料已略過");
                     break;
                 }
                 try {
