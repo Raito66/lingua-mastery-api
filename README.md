@@ -186,6 +186,7 @@ Server runs at `http://localhost:8080`
 - CSV 匯入新增最大 500 筆上限，超出時回報提示並略過剩餘資料
 - CSV 匯入超過 5MB 時回傳友善錯誤訊息（HTTP 413）
 - 新增日文 / 英文範例 CSV 靜態下載（`/sample-words-japanese.csv`、`/sample-words-english.csv`）
+- 修正 CSV 編碼偵測回傳值 cast 不安全問題
 
 ### v0.9.5 (2026-05-21)
 - 新增登入 / 註冊 Rate Limiting（登入 5 次/分鐘、註冊 3 次/10 分鐘，依 IP）
@@ -240,6 +241,7 @@ Server runs at `http://localhost:8080`
 - CSV import: 500 row limit with graceful truncation message
 - CSV import: 5MB file size limit with HTTP 413 error response
 - Added sample CSV static files (`/sample-words-japanese.csv`, `/sample-words-english.csv`)
+- Fixed unsafe cast in CSV charset detection helper
 
 ### v0.9.5 (2026-05-21)
 - Added rate limiting (login: 5/min, register: 3/10min per IP)
