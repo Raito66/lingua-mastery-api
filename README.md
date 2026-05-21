@@ -26,6 +26,8 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 使用者註冊 / 登入（JWT 驗證）
 - Email 驗證（註冊後需驗證才能登入）
 - 忘記密碼 / 重設密碼
+- Rate Limiting（登入 5 次/分鐘、註冊 3 次/10 分鐘，防止暴力攻擊）
+- 密碼強度驗證（至少 8 碼，須含英文字母與數字）
 - 單字書 CRUD（含重新命名與語言切換）
 - 單字 CRUD
 - CSV 批次匯入單字（含重複檢查、部分成功）
@@ -126,6 +128,8 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - User registration / login with JWT
 - Email verification (required before login)
 - Forgot password / password reset
+- Rate limiting (login: 5/min, register: 3/10min per IP)
+- Password strength validation (min 8 chars, letters + numbers required)
 - Vocabulary book CRUD (rename & language switch)
 - Word CRUD
 - CSV batch import (with duplicate check & partial success)
