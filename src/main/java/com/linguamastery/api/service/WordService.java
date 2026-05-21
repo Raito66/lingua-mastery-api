@@ -127,7 +127,7 @@ public class WordService {
         byte[] bytes = file.getBytes();
         Object[] charsetAndBom = detectCharsetAndBom(bytes);
         Charset charset = (Charset) charsetAndBom[0];
-        int offset = (int) charsetAndBom[1];
+        int offset = ((Number) charsetAndBom[1]).intValue();
 
         try (var reader = new CSVReaderBuilder(
                 new InputStreamReader(
