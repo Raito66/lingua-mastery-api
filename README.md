@@ -186,6 +186,9 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v1.0.2 (2026-05-22)
+- 修正：範例 CSV 加入 UTF-8 BOM，修正 Windows Excel 開啟中文亂碼
+
 ### v1.0.1 (2026-05-22)
 - 新增：註冊時要求填入顯示名稱（`RegisterRequest` 加入 `displayName`）
 - 修正：重設密碼驗證規則改為 8 碼+英數，與註冊一致
@@ -259,6 +262,9 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v1.0.2 (2026-05-22)
+- Fix: Added UTF-8 BOM to sample CSV files — fixes garbled Chinese when opened in Windows Excel
 
 ### v1.0.1 (2026-05-22)
 - Add: Display name required at registration
