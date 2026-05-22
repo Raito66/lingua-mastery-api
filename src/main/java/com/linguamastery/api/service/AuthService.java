@@ -35,6 +35,7 @@ public class AuthService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setDisplayName(request.getDisplayName().trim());
         user.setEmailVerified(false);
         user.setVerificationToken(token);
         user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
