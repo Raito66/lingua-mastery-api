@@ -1,7 +1,7 @@
 package com.linguamastery.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -10,6 +10,9 @@ public class ResetPasswordRequest {
     private String token;
 
     @NotBlank
-    @Size(min = 6, message = "密碼至少 6 個字元")
+    @Pattern(
+        regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
+        message = "密碼至少 8 碼，須包含英文字母與數字"
+    )
     private String password;
 }
