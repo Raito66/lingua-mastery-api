@@ -8,7 +8,6 @@ import com.linguamastery.api.repository.DailyRecordRepository;
 import com.linguamastery.api.repository.StudyLogRepository;
 import com.linguamastery.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,27 +66,9 @@ public class StatsService {
         return new StreakResponse(streak, todayCount);
     }
 
-    /** StudyService / ReviewService 呼叫，記錄今日學習 */
+    /** StudyService / ReviewService 呼叫，記錄今日學習（原子性 upsert，並發安全） */
     @Transactional
     public void recordDailyActivity(User user) {
-        try {
-            DailyRecord record = dailyRecordRepository
-                    .findByUserIdAndDate(user.getId(), LocalDate.now())
-                    .orElseGet(() -> {
-                        DailyRecord r = new DailyRecord();
-                        r.setUser(user);
-                        r.setDate(LocalDate.now());
-                        return r;
-                    });
-            record.setWordsStudied(record.getWordsStudied() + 1);
-            dailyRecordRepository.save(record);
-        } catch (DataIntegrityViolationException e) {
-            // 並發情況下兩個請求同時新增同一天的紀錄，重新查詢並遞增
-            dailyRecordRepository.findByUserIdAndDate(user.getId(), LocalDate.now())
-                    .ifPresent(record -> {
-                        record.setWordsStudied(record.getWordsStudied() + 1);
-                        dailyRecordRepository.save(record);
-                    });
-        }
+        dailyRecordRepository.upsertDailyRecord(user.getId(), LocalDate.now());
     }
 }

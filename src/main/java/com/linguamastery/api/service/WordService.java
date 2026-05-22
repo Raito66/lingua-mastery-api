@@ -146,7 +146,7 @@ public class WordService {
                 } catch (Exception e) {
                     failed++;
                     errors.add("第 " + lineNum + " 行：CSV 格式錯誤");
-                    break;
+                    continue;
                 }
                 rowsRead++;
                 if (rowsRead > MAX_IMPORT_ROWS) {
@@ -213,16 +213,24 @@ public class WordService {
         if (wordIds == null || wordIds.isEmpty()) {
             throw new IllegalArgumentException("請至少選擇一個單字");
         }
+        if (wordIds.size() > 100) {
+            throw new IllegalArgumentException("每次最多刪除 100 個單字");
+        }
+        User user = getUser(email);
         List<Word> words = wordRepository.findAllById(wordIds);
-        words.forEach(word -> validateOwnership(email, word));
+        words.forEach(word -> {
+            if (!word.getBook().getUser().getId().equals(user.getId())) {
+                throw new SecurityException("無權限操作此資源");
+            }
+        });
         wordRepository.deleteAll(words);
     }
 
     private void applyRequest(Word word, WordRequest request) {
-        word.setWord(request.getWord());
-        word.setReading(request.getReading());
-        word.setTranslation(request.getTranslation());
-        word.setExample(request.getExample());
+        word.setWord(request.getWord().trim());
+        word.setReading(request.getReading() != null ? request.getReading().trim() : null);
+        word.setTranslation(request.getTranslation().trim());
+        word.setExample(request.getExample() != null ? request.getExample().trim() : null);
         word.setLevel(request.getLevel());
         word.setLanguage(request.getLanguage());
     }

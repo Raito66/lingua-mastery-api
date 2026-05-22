@@ -109,11 +109,11 @@ public class ReviewService {
         // 批次取得到期數與新單字數，各只打一次 DB
         Map<Long, Long> dueMap = new HashMap<>();
         reviewRepository.countDueByBookForUser(user.getId(), LocalDate.now())
-                .forEach(row -> dueMap.put((Long) row[0], (Long) row[1]));
+                .forEach(row -> dueMap.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue()));
 
         Map<Long, Long> newMap = new HashMap<>();
         wordRepository.countNewWordsByBookIdsForUser(bookIds, user.getId())
-                .forEach(row -> newMap.put((Long) row[0], (Long) row[1]));
+                .forEach(row -> newMap.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue()));
 
         return books.stream()
                 .map(book -> {
