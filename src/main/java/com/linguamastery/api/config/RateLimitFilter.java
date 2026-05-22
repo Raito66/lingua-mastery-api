@@ -24,6 +24,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> loginBuckets = new ConcurrentHashMap<>();
     // 註冊：每 IP 每 10 分鐘最多 3 次
     private final Map<String, Bucket> registerBuckets = new ConcurrentHashMap<>();
+    // 忘記密碼 / 重寄驗證信：每 IP 每 10 分鐘最多 3 次
+    private final Map<String, Bucket> emailBuckets = new ConcurrentHashMap<>();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -42,6 +44,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
                     Bucket.builder()
                             .addLimit(Bandwidth.classic(3, Refill.intervally(3, Duration.ofMinutes(10))))
                             .build());
+        } else if (path.equals("/api/auth/forgot-password") || path.equals("/api/auth/resend-verification")) {
+            bucket = emailBuckets.computeIfAbsent(getClientIp(request), ip ->
+                    Bucket.builder()
+                            .addLimit(Bandwidth.classic(3, Refill.intervally(3, Duration.ofMinutes(10))))
+                            .build());
         }
 
         if (bucket != null && !bucket.tryConsume(1)) {
@@ -54,11 +61,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * 取得客戶端真實 IP。
+     * 在 Render 反向代理環境下，使用 X-Forwarded-For 的最後一個 IP（由 Render LB 附加，不可被客戶端偽造）。
+     * 若 header 不存在則 fallback 至 RemoteAddr。
+     */
     private String getClientIp(HttpServletRequest request) {
-        // 取 X-Forwarded-For（Render 反向代理會加這個 header）
         String forwarded = request.getHeader("X-Forwarded-For");
         if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
+            String[] ips = forwarded.split(",");
+            // 最後一個 IP 由最近的受信任代理附加，防止客戶端偽造 header 繞過限流
+            return ips[ips.length - 1].trim();
         }
         return request.getRemoteAddr();
     }
