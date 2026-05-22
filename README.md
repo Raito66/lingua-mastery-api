@@ -181,6 +181,16 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v0.9.7 (2026-05-22)
+- 安全：CORS 限制為前端域名，不再允許萬用字元
+- 安全：forgot-password / resend-verification 補上 Rate Limiting
+- 安全：RateLimitFilter 改取 X-Forwarded-For 最後一個 IP 防偽造
+- 安全：JwtTokenProvider 啟動時驗證 secret 長度（< 32 bytes 拋出例外）
+- 修正：StatsService 以 PostgreSQL upsert 解決並發 race condition
+- 修正：ReviewService 原生查詢 row cast 改用 (Number).longValue()
+- 修正：WordService CSV 匯入解析錯誤改 continue（不再中斷整個匯入）
+- 修正：WordService applyRequest 補 trim、deleteWords 補 100 筆上限並快取 User
+
 ### v0.9.6 (2026-05-21)
 - CSV 匯入新增編碼自動偵測（UTF-8 BOM / Shift-JIS，解決日文 Windows Excel 亂碼問題）
 - CSV 匯入新增最大 500 筆上限，超出時回報提示並略過剩餘資料
@@ -235,6 +245,16 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v0.9.7 (2026-05-22)
+- Security: CORS locked to frontend domain, wildcard removed
+- Security: Rate limiting added to forgot-password and resend-verification endpoints
+- Security: RateLimitFilter uses last IP in X-Forwarded-For to prevent header spoofing
+- Security: JwtTokenProvider validates secret length at startup (throws if < 32 bytes)
+- Fix: StatsService uses PostgreSQL upsert to resolve concurrent race condition
+- Fix: ReviewService native query row cast changed to (Number).longValue()
+- Fix: WordService CSV import parse errors now use continue instead of break
+- Fix: WordService applyRequest trims inputs; deleteWords enforces 100-item limit and caches User
 
 ### v0.9.6 (2026-05-21)
 - CSV import: auto charset detection (UTF-8 BOM / Shift-JIS, fixes Japanese Windows Excel encoding)
