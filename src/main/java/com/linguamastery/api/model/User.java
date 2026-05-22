@@ -40,6 +40,9 @@ public class User {
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(name = "display_name", length = 50)
+    private String displayName;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

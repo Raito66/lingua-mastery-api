@@ -36,6 +36,7 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 間隔重複複習系統（SRS / SM-2 演算法）
 - 每日學習 Streak（連續天數 + 今日練習數）
 - 選擇題測驗（四選一，Fisher-Yates 隨機選項）
+- 會員個人資料（顯示名稱編輯、密碼更改）
 
 ### 本地啟動
 
@@ -103,6 +104,9 @@ app:
 | POST   | `/api/review/result` | 提交 SRS 複習結果（更新排程） |
 | POST   | `/api/books/{bookId}/words/import` | CSV 批次匯入單字 |
 | DELETE | `/api/words/batch` | 批次刪除單字 |
+| GET    | `/api/profile` | 取得個人資料（email、顯示名稱） |
+| PUT    | `/api/profile` | 更新顯示名稱 |
+| PUT    | `/api/profile/password` | 更改密碼 |
 
 ---
 
@@ -138,6 +142,7 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - Spaced Repetition System (SRS / SM-2 algorithm)
 - Daily learning streak (consecutive days + today's count)
 - Multiple choice quiz (4 options, Fisher-Yates randomization)
+- Member profile (display name edit, password change)
 
 ### Getting Started
 
@@ -180,6 +185,11 @@ Server runs at `http://localhost:8080`
 ---
 
 ## 更新日誌 / Changelog
+
+### v1.0.0 (2026-05-22)
+- 新增：會員專區 API（`GET/PUT /api/profile`、`PUT /api/profile/password`）
+- 新增：`display_name` 欄位至 `users` 資料表（ddl-auto 自動遷移）
+- 修正：靜態範例 CSV 下載不再需要登入（`/sample-words-*.csv` 公開存取）
 
 ### v0.9.7 (2026-05-22)
 - 安全：CORS 限制為前端域名，不再允許萬用字元
@@ -245,6 +255,11 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v1.0.0 (2026-05-22)
+- Add: Member profile API (GET/PUT /api/profile, PUT /api/profile/password)
+- Add: `display_name` column on `users` table (auto-migrated via ddl-auto)
+- Fix: Sample CSV files now publicly accessible without login
 
 ### v0.9.7 (2026-05-22)
 - Security: CORS locked to frontend domain, wildcard removed
