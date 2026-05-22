@@ -186,6 +186,10 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v1.0.1 (2026-05-22)
+- 新增：註冊時要求填入顯示名稱（`RegisterRequest` 加入 `displayName`）
+- 修正：重設密碼驗證規則改為 8 碼+英數，與註冊一致
+
 ### v1.0.0 (2026-05-22)
 - 新增：會員專區 API（`GET/PUT /api/profile`、`PUT /api/profile/password`）
 - 新增：`display_name` 欄位至 `users` 資料表（ddl-auto 自動遷移）
@@ -255,6 +259,10 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v1.0.1 (2026-05-22)
+- Add: Display name required at registration
+- Fix: Reset password validation now matches registration (8+ chars, letters + numbers)
 
 ### v1.0.0 (2026-05-22)
 - Add: Member profile API (GET/PUT /api/profile, PUT /api/profile/password)
