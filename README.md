@@ -32,7 +32,7 @@ LinguaMastery 後端 API，基於 Spring Boot 開發，提供語言學習平台�
 - 單字 CRUD
 - CSV 批次匯入單字（含重複檢查、部分成功、UTF-8 / Shift-JIS 編碼自動偵測、500 筆上限）
 - 單字批次刪除
-- 閃卡測驗與學習統計
+- 閃卡測驗與學習統計（全局 + 每本書獨立統計）
 - 間隔重複複習系統（SRS / SM-2 演算法）
 - 每日學習 Streak（連續天數 + 今日練習數）
 - 選擇題測驗（四選一，Fisher-Yates 隨機選項）
@@ -139,7 +139,7 @@ Backend API for LinguaMastery, a gamified language learning platform. Built with
 - Word CRUD
 - CSV batch import (duplicate check, partial success, UTF-8 / Shift-JIS auto-detection, 500 row limit)
 - Batch word deletion
-- Flashcard study and learning statistics
+- Flashcard study and learning statistics (global + per-book)
 - Spaced Repetition System (SRS / SM-2 algorithm)
 - Daily learning streak (consecutive days + today's count)
 - Multiple choice quiz (4 options, Fisher-Yates randomization)
