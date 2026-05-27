@@ -1,5 +1,6 @@
 package com.linguamastery.api.controller;
 
+import com.linguamastery.api.dto.BookStatsResponse;
 import com.linguamastery.api.dto.StatsResponse;
 import com.linguamastery.api.dto.StreakResponse;
 import com.linguamastery.api.service.StatsService;
@@ -24,5 +25,12 @@ public class StatsController {
     @GetMapping("/streak")
     public ResponseEntity<StreakResponse> getStreak(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(statsService.getStreak(userDetails.getUsername()));
+    }
+
+    @GetMapping("/book/{bookId}")
+    public ResponseEntity<BookStatsResponse> getBookStats(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long bookId) {
+        return ResponseEntity.ok(statsService.getBookStats(userDetails.getUsername(), bookId));
     }
 }
