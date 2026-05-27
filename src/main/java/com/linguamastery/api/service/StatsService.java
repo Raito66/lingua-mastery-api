@@ -1,19 +1,28 @@
 package com.linguamastery.api.service;
 
+import com.linguamastery.api.dto.BookStatsResponse;
 import com.linguamastery.api.dto.StatsResponse;
 import com.linguamastery.api.dto.StreakResponse;
 import com.linguamastery.api.model.DailyRecord;
 import com.linguamastery.api.model.User;
+import com.linguamastery.api.model.WordBook;
 import com.linguamastery.api.repository.DailyRecordRepository;
 import com.linguamastery.api.repository.StudyLogRepository;
 import com.linguamastery.api.repository.UserRepository;
+import com.linguamastery.api.repository.UserWordStatusRepository;
+import com.linguamastery.api.repository.WordBookRepository;
+import com.linguamastery.api.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +31,9 @@ public class StatsService {
     private final StudyLogRepository studyLogRepository;
     private final UserRepository userRepository;
     private final DailyRecordRepository dailyRecordRepository;
+    private final WordBookRepository wordBookRepository;
+    private final WordRepository wordRepository;
+    private final UserWordStatusRepository userWordStatusRepository;
 
     @Transactional(readOnly = true)
     public StatsResponse getStats(String email) {
@@ -64,6 +76,44 @@ public class StatsService {
         }
 
         return new StreakResponse(streak, todayCount);
+    }
+
+    @Transactional(readOnly = true)
+    public BookStatsResponse getBookStats(String email, Long bookId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("使用者不存在"));
+
+        WordBook book = wordBookRepository.findById(bookId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "單字本不存在"));
+        if (!book.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "無權限存取此單字本");
+        }
+
+        long totalWords = wordRepository.countByBookId(bookId);
+        long totalStudied = studyLogRepository.countByUserIdAndBookId(user.getId(), bookId);
+        long totalCorrect = studyLogRepository.countCorrectByUserIdAndBookId(user.getId(), bookId);
+        double accuracy = totalStudied > 0 ? Math.round((double) totalCorrect / totalStudied * 10000.0) / 100.0 : 0.0;
+
+        List<Object[]> levelCounts = userWordStatusRepository.countByLevelForUserAndBook(user.getId(), bookId);
+        Map<Integer, Long> levelMap = new HashMap<>();
+        for (Object[] row : levelCounts) {
+            levelMap.put((Integer) row[0], (Long) row[1]);
+        }
+        long learning = levelMap.getOrDefault(1, 0L);
+        long familiar = levelMap.getOrDefault(2, 0L);
+        long mastered = levelMap.getOrDefault(3, 0L);
+        long notLearned = Math.max(0, totalWords - learning - familiar - mastered);
+
+        BookStatsResponse response = new BookStatsResponse();
+        response.setTotalWords(totalWords);
+        response.setTotalStudied(totalStudied);
+        response.setTotalCorrect(totalCorrect);
+        response.setAccuracy(accuracy);
+        response.setNotLearned(notLearned);
+        response.setLearning(learning);
+        response.setFamiliar(familiar);
+        response.setMastered(mastered);
+        return response;
     }
 
     /** StudyService / ReviewService 呼叫，記錄今日學習（原子性 upsert，並發安全） */

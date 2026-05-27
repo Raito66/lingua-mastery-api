@@ -98,6 +98,7 @@ app:
 | POST   | `/api/study/result` | 提交閃卡答題結果 |
 | GET    | `/api/stats` | 取得學習統計 |
 | GET    | `/api/stats/streak` | 取得連續天數與今日練習數 |
+| GET    | `/api/stats/book/{bookId}` | 取得單一書本統計（練習次數、準確率、熟練度分布） |
 | GET    | `/api/quiz/{bookId}` | 取得選擇題題目（四選一） |
 | GET    | `/api/review/stats` | 取得各書今日複習數量 |
 | GET    | `/api/review/{bookId}` | 取得本次 SRS 複習單字 |
@@ -186,6 +187,9 @@ Server runs at `http://localhost:8080`
 
 ## 更新日誌 / Changelog
 
+### v1.0.3 (2026-05-27)
+- 新增：每本書獨立統計 API（`GET /api/stats/book/{bookId}`）— 回傳練習次數、準確率、熟練度分布
+
 ### v1.0.2 (2026-05-22)
 - 修正：範例 CSV 加入 UTF-8 BOM，修正 Windows Excel 開啟中文亂碼
 
@@ -262,6 +266,9 @@ Server runs at `http://localhost:8080`
 - 初始版本：使用者驗證、單字書 CRUD、閃卡測驗、學習統計
 
 ---
+
+### v1.0.3 (2026-05-27)
+- Add: Per-book statistics API (`GET /api/stats/book/{bookId}`) — returns study count, accuracy, proficiency distribution
 
 ### v1.0.2 (2026-05-22)
 - Fix: Added UTF-8 BOM to sample CSV files — fixes garbled Chinese when opened in Windows Excel

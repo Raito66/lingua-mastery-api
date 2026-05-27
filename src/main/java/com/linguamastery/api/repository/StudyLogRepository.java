@@ -14,6 +14,12 @@ public interface StudyLogRepository extends JpaRepository<StudyLog, Long> {
     @Query("SELECT COUNT(sl) FROM StudyLog sl WHERE sl.user.id = :userId AND sl.correct = true")
     long countCorrectByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT COUNT(sl) FROM StudyLog sl WHERE sl.user.id = :userId AND sl.word.book.id = :bookId")
+    long countByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
+
+    @Query("SELECT COUNT(sl) FROM StudyLog sl WHERE sl.user.id = :userId AND sl.word.book.id = :bookId AND sl.correct = true")
+    long countCorrectByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
+
     @Modifying
     @Query("DELETE FROM StudyLog sl WHERE sl.word.book.id = :bookId")
     void deleteByBookId(@Param("bookId") Long bookId);
